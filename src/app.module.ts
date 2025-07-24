@@ -12,7 +12,7 @@ import { HelperModule } from './helper/helper.module';
       envFilePath: '.env', 
     }),
     
-    MongooseModule.forRoot('mongodb+srv://parthasrikar853:GYxWUZdF3fUeSNPt@cluster0.avwagaa.mongodb.net/helper-assignment'),
+    MongooseModule.forRoot(process.env.MONGODB_URI || ''),
     HelperModule,
   ],
   controllers: [AppController],
