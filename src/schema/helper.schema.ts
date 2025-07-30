@@ -9,30 +9,29 @@ export enum GenderEnum {
 }
 
 export enum DocType {
-    ADHAAR = 'adhaar',
-    PAN = 'pan',
-    VOTER = 'voter',
-    PASSPORT = 'passport'
+  ADHAAR = 'adhaar',
+  PAN = 'pan',
+  VOTER = 'voter',
+  PASSPORT = 'passport'
 }
 
-
 export enum VehiclesType {
-    NONE = 'none', 
-    BIKE = 'bike',
-    AUTO = 'auto',
-    CAR = 'car'
+  NONE = 'none', 
+  BIKE = 'bike',
+  AUTO = 'auto',
+  CAR = 'car'
 }
 
 export enum Roles {
-    MAID = 'maid',
-    COOK = 'cook',
-    DRIVER = 'driver',
-    NURSE = 'nurse'
+  MAID = 'maid',
+  COOK = 'cook',
+  DRIVER = 'driver',
+  NURSE = 'nurse'
 }
 
 @Schema({ timestamps: true })
 export class Helper {
-    @Prop({ type: String, default: () => new mongoose.Types.ObjectId().toString() })
+  @Prop({ type: String, default: () => new mongoose.Types.ObjectId().toString() })
   id: string;
 
   @Prop({ 
@@ -43,7 +42,6 @@ export class Helper {
     index: true
   })
   name: string;
-
 
   @Prop({ 
     required: true, 
@@ -66,7 +64,7 @@ export class Helper {
   @Prop({ 
     required: true, 
     trim: true, 
-    match: /^[+]?[1-9][\d]{0,15}$/
+    match: /^[+]?[1-9][\d]{0,15}$/  // E.164-like validation
   })
   phone: string;
 
@@ -106,6 +104,15 @@ export class Helper {
   employeeId: number;
 
   @Prop({ 
+    default: Date.now,
+    validate: {
+      validator: (date: Date) => date <= new Date(),
+      message: 'Joined date cannot be in the future'
+    }
+  })
+  joinedDate: Date;
+
+  @Prop({ 
     required: true, 
     trim: true, 
     enum : Object.values(VehiclesType),
@@ -122,10 +129,31 @@ export class Helper {
   })
   status: DocType;
 
-  @Prop() 
-  kycUrl : string;
+  // File fields with validation
+  @Prop({ 
+    trim: true,
+    match: /^https?:\/\/.+/,
+    required: false
+  })
+  kycUrl: string;
 
-    
+  @Prop({
+    trim: true,
+    minlength: 3,
+    maxlength: 255,
+    required: false
+  })
+  kycFileName: string;
+
+  @Prop({
+    type: Date,
+    validate: {
+      validator: (date: Date) => !date || date <= new Date(),
+      message: 'KYC uploaded date cannot be in the future'
+    },
+    required: false
+  })
+  kycUploadedAt: Date;
 }
 
 export const helperSchma = SchemaFactory.createForClass(Helper);
